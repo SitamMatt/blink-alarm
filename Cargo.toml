@@ -2,6 +2,8 @@
 name = "blink-alarm"
 version = "0.1.0"
 edition = "2021"
+authors = ["Mateusz Szewc <mateuszszewc@op.pl>"]
+description = "Simple program that runs in a loop and sends windows notifications according to specified schedule."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
