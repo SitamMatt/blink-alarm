@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use std::time::Duration;
 use job_scheduler::{Job, JobScheduler};
 use winrt_notification::{Sound, Toast};
@@ -14,7 +16,6 @@ const DEFAULT_CONFIGURATION: &str = include_str!("../configuration_example.json"
 struct Configuration {
     schedule: String,
 }
-
 
 fn read_configuration_from_file(path: &String) -> Result<Configuration, Box<dyn Error>> {
     let file = File::open(path)?;
