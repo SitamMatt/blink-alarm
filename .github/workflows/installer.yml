@@ -1,0 +1,26 @@
+name: Build Installer
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/install@v0.1
+        with:
+         crate: cargo-wix
+         version: latest
+      - run: cargo wix
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+         name: installer
+         path: target/wix/blink-alarm-*-x86_64.msi
+         retention-days: 5
