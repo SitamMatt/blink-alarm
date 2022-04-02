@@ -1,14 +1,14 @@
 #![windows_subsystem = "windows"]
 
-use std::time::Duration;
 use job_scheduler::{Job, JobScheduler};
-use winrt_notification::{Sound, Toast};
-use std::{env, fs};
-use std::fs::File;
-use std::io::BufReader;
 use serde::Deserialize;
 use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
 use std::result::Result;
+use std::time::Duration;
+use std::env;
+use winrt_notification::{Sound, Toast};
 
 const DEFAULT_CONFIGURATION: &str = include_str!("../configuration_example.json");
 
@@ -17,19 +17,19 @@ struct Configuration {
     schedule: String,
 }
 
-fn read_configuration_from_file(path: &String) -> Result<Configuration, Box<dyn Error>> {
+fn read_configuration_from_file(path: &str) -> Result<Configuration, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
 
     let config: Configuration = serde_json::from_reader(reader)?;
 
-    return Ok(config);
+    Ok(config)
 }
 
 fn read_configuration_from_string(str: &str) -> Result<Configuration, Box<dyn Error>> {
     let config: Configuration = serde_json::from_str(str)?;
 
-    return Ok(config);
+    Ok(config)
 }
 
 #[cfg(windows)]
@@ -38,7 +38,9 @@ fn main() {
 
     let config = if args.len() > 1 {
         read_configuration_from_file(&args[1]).unwrap()
-    } else { read_configuration_from_string(DEFAULT_CONFIGURATION).unwrap() };
+    } else {
+        read_configuration_from_string(DEFAULT_CONFIGURATION).unwrap()
+    };
 
     let mut sched = JobScheduler::new();
 
