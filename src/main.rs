@@ -1,4 +1,4 @@
-#![windows_subsystem = "windows"]
+// #![windows_subsystem = "windows"]
 
 use job_scheduler::{Job, JobScheduler};
 use serde::Deserialize;
@@ -9,6 +9,7 @@ use std::result::Result;
 use std::time::Duration;
 use std::env;
 use winrt_notification::{Sound, Toast};
+use std::sync::mpsc;
 
 const DEFAULT_CONFIGURATION: &str = include_str!("../configuration_example.json");
 
@@ -32,8 +33,15 @@ fn read_configuration_from_string(str: &str) -> Result<Configuration, Box<dyn Er
     Ok(config)
 }
 
+enum Message {
+    Exit,
+}
+
 #[cfg(windows)]
 fn main() {
+
+    use tray_item::TrayItem;
+
     let args: Vec<String> = env::args().collect();
 
     let config = if args.len() > 1 {
@@ -42,9 +50,34 @@ fn main() {
         read_configuration_from_string(DEFAULT_CONFIGURATION).unwrap()
     };
 
+    std::thread::spawn(move || {
+        scheduler_loop(config)
+    });
+
+    let mut tray = TrayItem::new("Blink Alaram", "icon").unwrap();
+
+    let (tx, rx) = mpsc::channel();
+
+    tray.add_menu_item("Exit", move || {
+        tx.send(Message::Exit).unwrap();
+    })
+    .unwrap();
+
+    loop {
+        match rx.recv() {
+            Ok(Message::Exit) => break,
+            _ => {}
+        }
+    }
+    
+
+    
+}
+
+fn scheduler_loop(configuration: Configuration){
     let mut sched = JobScheduler::new();
 
-    sched.add(Job::new(config.schedule.parse().unwrap(), || {
+    sched.add(Job::new(configuration.schedule.parse().unwrap(), || {
         Toast::new(Toast::POWERSHELL_APP_ID)
             .title("Blink!")
             .text1("Blink your eyes")
@@ -56,7 +89,6 @@ fn main() {
 
     loop {
         sched.tick();
-
         std::thread::sleep(Duration::from_secs(1));
     }
 }

@@ -5,6 +5,8 @@ edition = "2021"
 authors = ["Mateusz Szewc <mateuszszewc@op.pl>"]
 description = "Simple program that runs in a loop and sends windows notifications according to specified schedule."
 
+build = "build.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -12,3 +14,7 @@ winrt-notification = "0.5.1"
 job_scheduler = "1.2.1"
 serde_json = "1.0.79"
 serde = { version = "1.0.136", features = ["derive"] }
+tray-item = "0.7.0"
+
+[build-dependencies]
+winres = "0.1.12"
